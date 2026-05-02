@@ -1,0 +1,296 @@
+project:
+  name: dmp_microloan_rl
+  seed: 42
+  log_level: INFO
+
+env:
+  n_clients: 1000
+  episode_steps: 1
+  max_episode_steps: 1
+  fairness_history_window: 100
+  action_space:
+    low: 0.08
+    high: 0.36
+    shape: 1
+  observation_space:
+    shape: 10
+    low: 0.0
+    high: 1.0
+  info_keys:
+    - accepted
+    - repaid
+    - profit
+    - client_segment
+    - rate_offered
+
+data:
+  demographic_groups:
+    - GroupA
+    - GroupB
+    - GroupC
+  risk_segments:
+    - low_risk
+    - medium_risk
+    - high_risk
+  group_weights:
+    GroupA: 0.50
+    GroupB: 0.30
+    GroupC: 0.20
+  segment_weights:
+    low_risk: 0.40
+    medium_risk: 0.40
+    high_risk: 0.20
+  segment_weights_by_group:
+    GroupA:
+      low_risk: 0.55
+      medium_risk: 0.35
+      high_risk: 0.10
+    GroupB:
+      low_risk: 0.35
+      medium_risk: 0.40
+      high_risk: 0.25
+    GroupC:
+      low_risk: 0.30
+      medium_risk: 0.40
+      high_risk: 0.30
+  feature_distributions:
+    low_risk:
+      monthly_income:
+        family: lognormal
+        mean: 350.0
+        sigma: 80.0
+        clip:
+          min: 150.0
+          max: 800.0
+      loan_amount_requested:
+        family: lognormal
+        mean: 800.0
+        sigma: 200.0
+        clip:
+          min: 200.0
+          max: 2000.0
+      existing_debt_ratio:
+        family: beta
+        a: 2.0
+        b: 8.0
+      credit_score:
+        family: beta
+        a: 8.0
+        b: 2.0
+      savings_balance:
+        family: lognormal
+        mean: 200.0
+        sigma: 100.0
+        clip:
+          min: 0.0
+          max: 1000.0
+      num_previous_loans:
+        family: poisson
+        lambda: 4.0
+        clip:
+          min: 0
+          max: 10
+      previous_default_rate:
+        family: beta
+        a: 1.0
+        b: 12.0
+    medium_risk:
+      monthly_income:
+        family: lognormal
+        mean: 220.0
+        sigma: 80.0
+        clip:
+          min: 80.0
+          max: 600.0
+      loan_amount_requested:
+        family: lognormal
+        mean: 500.0
+        sigma: 150.0
+        clip:
+          min: 100.0
+          max: 1500.0
+      existing_debt_ratio:
+        family: beta
+        a: 4.0
+        b: 6.0
+      credit_score:
+        family: beta
+        a: 5.0
+        b: 5.0
+      savings_balance:
+        family: lognormal
+        mean: 80.0
+        sigma: 60.0
+        clip:
+          min: 0.0
+          max: 500.0
+      num_previous_loans:
+        family: poisson
+        lambda: 2.0
+        clip:
+          min: 0
+          max: 8
+      previous_default_rate:
+        family: beta
+        a: 2.0
+        b: 8.0
+    high_risk:
+      monthly_income:
+        family: lognormal
+        mean: 130.0
+        sigma: 60.0
+        clip:
+          min: 50.0
+          max: 400.0
+      loan_amount_requested:
+        family: lognormal
+        mean: 300.0
+        sigma: 100.0
+        clip:
+          min: 100.0
+          max: 1000.0
+      existing_debt_ratio:
+        family: beta
+        a: 6.0
+        b: 4.0
+      credit_score:
+        family: beta
+        a: 2.0
+        b: 8.0
+      savings_balance:
+        family: lognormal
+        mean: 20.0
+        sigma: 30.0
+        clip:
+          min: 0.0
+          max: 200.0
+      num_previous_loans:
+        family: poisson
+        lambda: 1.0
+        clip:
+          min: 0
+          max: 5
+      previous_default_rate:
+        family: beta
+        a: 4.0
+        b: 6.0
+  loan_purpose_weights:
+    business: 0.45
+    agriculture: 0.25
+    education: 0.20
+    emergency: 0.10
+  loan_purpose_repayment_multipliers:
+    business: 1.00
+    agriculture: 0.85
+    education: 1.05
+    emergency: 0.75
+  region_weights:
+    rural: 0.40
+    semi_urban: 0.35
+    urban: 0.25
+  region_income_multipliers:
+    urban: 1.00
+    semi_urban: 0.85
+    rural: 0.70
+  observation_features:
+    - monthly_income_normalized
+    - loan_amount_normalized
+    - existing_debt_ratio
+    - credit_score
+    - savings_balance_normalized
+    - num_previous_loans_normalized
+    - previous_default_rate
+    - risk_score
+    - loan_purpose_encoded
+    - region_encoded
+  observation_encoding:
+    loan_purpose:
+      business: 0.80
+      education: 0.90
+      agriculture: 0.60
+      emergency: 0.30
+    region:
+      urban: 0.80
+      semi_urban: 0.60
+      rural: 0.40
+  normalization:
+    monthly_income_max: 800.0
+    loan_amount_max: 2000.0
+    savings_balance_max: 1000.0
+    num_previous_loans_max: 10.0
+  risk_score:
+    min_value: 0.0
+    max_value: 1.0
+    weights:
+      credit_score: 0.35
+      inverse_existing_debt_ratio: 0.20
+      monthly_income_capped: 0.15
+      inverse_previous_default_rate: 0.15
+      savings_balance_capped: 0.10
+      num_previous_loans_capped: 0.05
+    caps:
+      monthly_income: 500.0
+      savings_balance: 300.0
+      num_previous_loans: 5.0
+
+reward:
+  alpha: 0.80
+  beta: 0.60
+  cost_of_funds: 0.05
+  default_loss_fraction: 0.50
+  reference_loan_amount: 500.0
+  fair_rate:
+    min: 0.10
+    max: 0.32
+  sensitivity_beta_values:
+    - 0.0  # pure greedy baseline
+    - 0.20 # below threshold — still greedy
+    - 0.40 # near threshold — transitioning
+    - 0.60 # default — fair pricing optimal
+    - 0.80 # strongly fair
+    - 1.20 # very strongly fair
+    - 2.00 # maximum fairness
+
+repayment_model:
+  acceptance:
+    # Calibrated defaults; the specs define the variables and directionality,
+    # while these coefficients keep probabilities in a realistic range.
+    intercept: 0.35
+    income_weight: 1.20
+    risk_score_weight: 1.80
+    interest_rate_weight: -4.00
+    min_probability: 0.01
+    max_probability: 0.99
+    region_rate_sensitivity:
+      urban: 1.00
+      semi_urban: 1.10
+      rural: 1.25
+  repayment:
+    # Calibrated defaults; the form matches the spec and purpose effects come
+    # from DATA_SPEC repayment multipliers.
+    intercept: -0.40
+    credit_score_weight: 2.00
+    income_weight: 0.80
+    loan_amount_weight: -0.30
+    loan_purpose_weight: 1.00
+    previous_default_rate_weight: -1.20
+    interest_rate_weight: -1.50
+    min_probability: 0.01
+    max_probability: 0.99
+
+training:
+  ppo_learning_rate: 0.0003
+  total_timesteps: 500000
+  sensitivity_timesteps: 200000
+  evaluation_episodes: 1000
+  run_sensitivity_analysis: true
+  model_dir: models
+  results_dir: results
+  tensorboard_log_dir: logs/tensorboard
+  ppo_model_filename: ppo_microloan.zip
+  ppo_results_filename: ppo_results.csv
+  evaluation_summary_filename: evaluation_summary.csv
+  ppo_ent_coef: 0.01 
+
+logging:
+  logger_name: dmp_microloan_rl
