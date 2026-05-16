@@ -1,13 +1,21 @@
-gymnasium>=0.29
-stable-baselines3>=2.0
-torch>=2.0
-numpy
+# gymnasium>=0.29
+# stable-baselines3>=2.0
+# torch>=2.0
+# numpy
+# pandas
+# fairlearn>=0.10
+# matplotlib
+# seaborn
+# streamlit>=1.30
+# pyyaml
+# omegaconf
+# tensorboard
+# pytest
+streamlit>=1.30
 pandas
-fairlearn>=0.10
+numpy
+plotly>=5.0
+omegaconf
+pyyaml
 matplotlib
 seaborn
-streamlit>=1.30
-pyyaml
-omegaconf
-tensorboard
-pytest
