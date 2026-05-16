@@ -78,10 +78,10 @@ Placeholder evaluation table:
 
 | Agent | Mean Reward | Mean Profit | Acceptance Rate | Controlled RDG | Fairness Score |
 |---|---:|---:|---:|---:|---:|
-| Random Agent | TBD | TBD | TBD | TBD | TBD |
-| Greedy Agent | TBD | TBD | TBD | TBD | TBD |
-| Fixed Rate Agent | TBD | TBD | TBD | TBD | TBD |
-| PPO | TBD | TBD | TBD | TBD | TBD |
+| Random Agent | 0.0079 | 55.34 | 0.647 | 0.020 | 0.538 |
+| Greedy Agent | -0.0267 | 81.29 | 0.524 | 0.000 | 0.745 |
+| Fixed Rate Agent | 0.0310 | 47.93 | 0.698 | 0.000 | 0.656 |
+| PPO | -0.0253 | 63.28 | 0.617 | 0.000 | 0.745 |
 
 ## Future Extensions
 
